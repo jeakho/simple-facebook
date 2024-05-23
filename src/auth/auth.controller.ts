@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './login.dto';
 
@@ -8,6 +8,13 @@ export class AuthController {
 
   @Post()
   login(@Body() { email, password }: LoginDto) {
+    if (typeof email !== 'string' || !email) {
+      throw new BadRequestException('Invalid type or value of parameter "email"')
+    }
+    if (typeof password !== 'string' || !password) {
+      throw new BadRequestException('Invalid type or value of parameter "password"')
+    }
+    
     return this.authService.login(email, password);
   }
 }

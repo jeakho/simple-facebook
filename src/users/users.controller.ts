@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 
 import { User as UserModel } from '@prisma/client';
 import { UserService } from 'src/users/user.service';
@@ -20,6 +20,16 @@ export class UsersController {
     async register(
         @Body() { name, email, password }: { name: string; email: string; password: string },
     ): Promise<AuthEntity> {
+        if (typeof name !== 'string' || !name) {
+            throw new BadRequestException('Invalid type or value of parameter "name"')
+        }
+        if (typeof email !== 'string' || !email) {
+            throw new BadRequestException('Invalid type or value of parameter "email"')
+        }
+        if (typeof password !== 'string' || !password) {
+            throw new BadRequestException('Invalid type or value of parameter "password"')
+        }
+
         await this.userService.createUser({
             name,
             email,
