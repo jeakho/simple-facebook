@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 
 import { User as UserModel } from '@prisma/client';
 import { UserService } from 'src/users/user.service';
@@ -18,30 +18,20 @@ export class UsersController {
 
     @Post('register')
     async register(
-        @Body() userData: { name: string; email: string; password: string },
+        @Body() { name, email, password }: { name: string; email: string; password: string },
     ): Promise<AuthEntity> {
-        try {
-            await this.userService.createUser({
-                name: userData.name,
-                email: userData.email,
-                hashedPassword: this.hash.hashCrypto(userData.password)
-            });
+        await this.userService.createUser({
+            name,
+            email,
+            hashedPassword: this.hash.hashCrypto(password)
+        });
 
-            return this.authService.login(userData.email, userData.password);
-        } catch (e) {
-            throw e;
-        }
+        return this.authService.login(email, password);
     }
 
     @Get(':id')
     @UseGuards(JwtAuthGuard)
     public findUser(@Param('id', ParseIntPipe) id: number): Promise<UserModel> {
-        console.log(typeof id)
         return this.userService.user({ id });
-    }
-
-    @Delete(':id')
-    async deletePost(@Param('id') id: number): Promise<UserModel> {
-      return this.userService.deleteUser({ id: Number(id) });
     }
 }
