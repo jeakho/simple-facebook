@@ -1,14 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
-import { JwtService } from '@nestjs/jwt';
-import { AuthEntity } from 'src/auth/auth.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService
+    private prisma: PrismaService
   ) {}
 
   async user(
@@ -36,20 +33,16 @@ export class UserService {
     });
   }
 
-  async createUser(data: Prisma.UserCreateInput): Promise<AuthEntity> {
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { email: data.email } });
   
     if (user) {
       throw new BadRequestException(`User with email: '${ data.email }' already exists`);
     }
 
-    const newUser = await this.prisma.user.create({
+    return this.prisma.user.create({
       data
     });
-
-    return {
-      accessToken: this.jwtService.sign({ userId: newUser.id }),
-    };
   }
 
   async updateUser(params: {
