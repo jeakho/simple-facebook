@@ -1,7 +1,8 @@
-import { Controller, Get, UseGuards, Post, Body, Request, BadRequestException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, Body, Request } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post as PostModel } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CreatePostDto } from './create-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -19,13 +20,9 @@ export class PostsController {
     @Post('post')
     @UseGuards(JwtAuthGuard)
     async createPost(
-      @Body() { post }: { post: string },
+      @Body() { content: post }: CreatePostDto,
       @Request() req: any
     ): Promise<PostModel> {
-        if (typeof post !== 'string') {
-            throw new BadRequestException('Invalid type of parameter "post"')
-        }
-
         return this.postService.createPost({
             post,
             author: {

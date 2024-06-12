@@ -7,7 +7,7 @@ import { UserModule } from './users/user.module';
 import { PostModule } from './posts/post.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, PostModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, UserModule, PostModule],
   controllers: [AppController],
   providers: [AppService],
 })
